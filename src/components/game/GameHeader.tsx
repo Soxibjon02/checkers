@@ -1,97 +1,96 @@
 import React from 'react';
-import { Volume2, VolumeX, HelpCircle, Home, RotateCcw } from 'lucide-react';
+import { Home, Settings, History, Undo2, RotateCcw } from 'lucide-react';
 import type { GameSettings } from '../../types/game';
 
 interface GameHeaderProps {
   settings: GameSettings;
-  onToggleSound: () => void;
-  onOpenRules: () => void;
+  canUndo: boolean;
+  historyCount: number;
+  isThinking: boolean;
   onReturnToMenu: () => void;
+  onOpenSettings: () => void;
+  onOpenHistory: () => void;
+  onUndo: () => void;
   onNewGame: () => void;
 }
 
 export const GameHeader: React.FC<GameHeaderProps> = ({
   settings,
-  onToggleSound,
-  onOpenRules,
+  canUndo,
+  historyCount,
+  isThinking,
   onReturnToMenu,
+  onOpenSettings,
+  onOpenHistory,
+  onUndo,
   onNewGame,
 }) => {
   return (
-    <header className="glass-panel" style={{ padding: '14px 24px', margin: '16px 24px 0 24px' }}>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          maxWidth: '1250px',
-          margin: '0 auto',
-          width: '100%',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+    <header className="game-top-header">
+      <div className="header-inner">
+        {/* Left: Home & Brand */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <button
             onClick={onReturnToMenu}
-            className="btn-icon"
-            title="Return to Menu"
+            className="btn-icon header-btn"
+            title="Bosh Menyu"
             aria-label="Return to Main Menu"
           >
-            <Home size={18} />
+            <Home size={17} />
           </button>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ fontSize: '1.25rem', fontWeight: 700, letterSpacing: '-0.02em' }}>
-                CHECKERS <span style={{ color: 'var(--accent-rose)', fontWeight: 800 }}>PRO</span>
-              </h1>
-              <span
-                style={{
-                  fontSize: '0.72rem',
-                  padding: '2px 8px',
-                  borderRadius: '999px',
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  color: 'var(--text-muted)',
-                  fontWeight: 600,
-                  textTransform: 'uppercase',
-                }}
-              >
-                {settings.gameMode === 'computer'
-                  ? `AI · ${settings.difficulty}`
-                  : '2 Players'}
-              </span>
-            </div>
-            <p style={{ fontSize: '0.78rem', color: 'var(--text-dim)', marginTop: '2px' }}>
-              Russian Draughts (Flying Kings & In-Flight Promotion)
-            </p>
+          <div className="header-brand">
+            <span style={{ fontWeight: 800, letterSpacing: '-0.02em', fontSize: '1.05rem' }}>
+              CHECKERS <span style={{ color: 'var(--accent-rose)' }}>PRO</span>
+            </span>
+            <span className="mode-badge">
+              {settings.gameMode === 'computer' ? `AI · ${settings.difficulty}` : '2P'}
+            </span>
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        {/* Right Action Buttons */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button
+            onClick={onUndo}
+            disabled={!canUndo || isThinking}
+            className="btn-secondary header-action-btn"
+            style={{
+              opacity: !canUndo || isThinking ? 0.45 : 1,
+              cursor: !canUndo || isThinking ? 'not-allowed' : 'pointer',
+            }}
+            title="Oxirgi yurishni qaytarish (Undo)"
+          >
+            <Undo2 size={15} />
+            <span className="hide-on-small">Orqaga</span>
+          </button>
+
+          <button
+            onClick={onOpenHistory}
+            className="btn-secondary header-action-btn"
+            title="Yurishlar tarixi"
+          >
+            <History size={15} />
+            <span className="hide-on-small">Tarix</span>
+            {historyCount > 0 && <span className="counter-badge">{historyCount}</span>}
+          </button>
+
           <button
             onClick={onNewGame}
-            className="btn-secondary"
-            style={{ padding: '8px 14px', fontSize: '0.85rem' }}
-            title="Restart Game"
+            className="btn-secondary header-action-btn"
+            title="Qayta boshlash"
           >
             <RotateCcw size={15} />
-            <span>Restart</span>
+            <span className="hide-on-small">Qayta</span>
           </button>
 
+          {/* Primary Settings Button */}
           <button
-            onClick={onToggleSound}
-            className="btn-icon"
-            title={settings.soundEnabled ? 'Mute Sound' : 'Enable Sound'}
-            aria-label={settings.soundEnabled ? 'Mute Sound' : 'Enable Sound'}
+            onClick={onOpenSettings}
+            className="btn-primary header-action-btn header-settings-btn"
+            title="O'yin Sozlamalari"
           >
-            {settings.soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
-          </button>
-
-          <button
-            onClick={onOpenRules}
-            className="btn-icon"
-            title="Game Rules"
-            aria-label="View Checkers Rules"
-          >
-            <HelpCircle size={18} />
+            <Settings size={16} />
+            <span>Sozlamalar</span>
           </button>
         </div>
       </div>
